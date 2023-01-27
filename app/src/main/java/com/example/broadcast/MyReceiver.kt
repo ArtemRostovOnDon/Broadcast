@@ -12,7 +12,7 @@ class MyReceiver: BroadcastReceiver() {
                 Toast.makeText(context,"Airplane mode is changed",Toast.LENGTH_SHORT).show()
             Intent.ACTION_BATTERY_LOW ->
                 Toast.makeText(context,"The battery is low",Toast.LENGTH_SHORT).show()
-            
+
         }
     }
 }
