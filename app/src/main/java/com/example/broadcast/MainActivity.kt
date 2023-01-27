@@ -7,9 +7,14 @@ import android.content.IntentFilter
 import android.os.Bundle
 import android.widget.ProgressBar
 import androidx.appcompat.app.AppCompatActivity
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 
 class MainActivity : AppCompatActivity() {
     lateinit var progressBar: ProgressBar
+   //если мы хотим чтобы наши акшины были только внутри одного приложения то пишем через этот класс
+    private val localBroadcastReceiver by lazy {
+        LocalBroadcastManager.getInstance(this)
+    }
 //если надо чтобы ресивер обрашался к вью элиментам то создаем его через анонимный класс
     private val receiver = object:BroadcastReceiver(){
         override fun onReceive(p0: Context?, p1: Intent?) {
@@ -30,8 +35,8 @@ class MainActivity : AppCompatActivity() {
         //добавляем свой акшен который в сервисах указали
             addAction("loader")
         }
-        //регистрируем и запускаем ресивер с нашими интенд фильтрами
-        registerReceiver(receiver,intendFilter)
+        //так же меняем везде обрашение к ресиверу
+        localBroadcastReceiver.registerReceiver(receiver,intendFilter)
         //запускаем сервис на выполнение
         Intent(this,MyService::class.java).apply {
             startService(this)
@@ -42,6 +47,6 @@ class MainActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         // отписываемся от ресивира чтобы не было утечек памяти
-        unregisterReceiver(receiver)
+        localBroadcastReceiver.unregisterReceiver(receiver)
     }
 }
