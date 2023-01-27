@@ -4,6 +4,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.widget.Button
 
 class MainActivity : AppCompatActivity() {
    //инициализируем класс ресивера
@@ -11,10 +12,18 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        findViewById<Button>(R.id.button).setOnClickListener {
+            //делаем свой ресивер, создаем интенд и отправляем его
+            val intend = Intent(MyReceiver.ACTION_CLICKED)
+            sendBroadcast(intend)
+        }
         //делаем интендФильтры с нужными нам полями
         val intendFilter = IntentFilter().apply {
+
             addAction(Intent.ACTION_AIRPLANE_MODE_CHANGED)
             addAction(Intent.ACTION_BATTERY_LOW)
+            //тут добавляем акшин с нашим значением
+            addAction(MyReceiver.ACTION_CLICKED)
         }
         //регистрируем и запускаем ресивер с нашими интенд фильтрами
         registerReceiver(receiver,intendFilter)
