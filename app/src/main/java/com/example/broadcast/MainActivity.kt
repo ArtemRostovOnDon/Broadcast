@@ -1,37 +1,43 @@
 package com.example.broadcast
 
+import android.content.BroadcastReceiver
+import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.widget.Button
+import android.widget.ProgressBar
+import androidx.appcompat.app.AppCompatActivity
 
 class MainActivity : AppCompatActivity() {
-   //инициализируем класс ресивера
-    private val receiver = MyReceiver()
+    lateinit var progressBar: ProgressBar
+//если надо чтобы ресивер обрашался к вью элиментам то создаем его через анонимный класс
+    private val receiver = object:BroadcastReceiver(){
+        override fun onReceive(p0: Context?, p1: Intent?) {
+            if (p1?.action == "loader"){
+                val percent = p1.getIntExtra("percent",0)
+                //принимаем интенд с сервиса
+                progressBar.progress = percent
+            }
+        }
+
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        findViewById<Button>(R.id.button).setOnClickListener {
-            //делаем свой ресивер, создаем интенд и отправляем его
-            val intend = Intent(MyReceiver.ACTION_CLICKED)
-            sendBroadcast(intend)
-        }
-        //делаем интендФильтры с нужными нам полями
-        val intendFilter = IntentFilter().apply {
+        progressBar = findViewById(R.id.progressBar)
 
-            addAction(Intent.ACTION_AIRPLANE_MODE_CHANGED)
-            addAction(Intent.ACTION_BATTERY_LOW)
-            //тут добавляем акшин с нашим значением
-            addAction(MyReceiver.ACTION_CLICKED)
+        val intendFilter = IntentFilter().apply {
+        //добавляем свой акшен который в сервисах указали
+            addAction("loader")
         }
         //регистрируем и запускаем ресивер с нашими интенд фильтрами
         registerReceiver(receiver,intendFilter)
+        //запускаем сервис на выполнение
+        Intent(this,MyService::class.java).apply {
+            startService(this)
+        }
 
     }
-    //начиная с версии api 26 у ресиверов зарегистрированных в манифесте не все акшины работают
-    //если мы регистрируем их здесь то в манифест ничего писать не надо
-
 
     override fun onDestroy() {
         super.onDestroy()
